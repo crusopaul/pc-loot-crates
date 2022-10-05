@@ -1,7 +1,7 @@
 local QBCore = exports['qb-core']:GetCoreObject()
 
 for k,v in pairs(Config.LootCrates) do
-    if QBCore.ShareItems[k] then
+    if QBCore.Shared.Items[k] then
         QBCore.Functions.CreateUseableItem(k, function(source, item)
             local player = QBCore.Functions.GetPlayer(source)
 
