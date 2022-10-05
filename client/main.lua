@@ -21,9 +21,13 @@ RegisterNetEvent('pc-loot-crates:client:OpenCrate', function(item)
             {},
             function() end,
             function()
-                TriggerServerEvent('pc-loot-crates:server:RemoveLootCrate', item)
                 TriggerServerEvent('pc-loot-crates:server:DropLoot', item)
             end
         )
     end
+end)
+
+RegisterNetEvent('pc-loot-crates:client:MakeInvAvailable', function()
+    LocalPlayer.state:set("inv_busy", false, true)
+    TriggerEvent('inventory:client:busy:status', false)
 end)

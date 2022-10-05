@@ -20,36 +20,35 @@ for k,v in pairs(Config.LootCrates) do
     end
 end
 
-RegisterNetEvent('pc-loot-crates:server:RemoveLootCrate', function(item)
+RegisterNetEvent('pc-loot-crates:server:DropLoot', function(item)
     local player = QBCore.Functions.GetPlayer(source)
 
     if player.Functions.RemoveItem(item, 1) then
+        local lootCrate = Config.LootCrates[item]
+        local lootTable = lootCrate.LootTable
+        local lootTableSize = #lootTable
+        local numberOfItemsRoll = math.random(lootCrate.MinDrops, lootCrate.MaxDrops)
+        local itemRoll = 0
+        local lootItem = nil
+
         TriggerClientEvent('inventory:client:ItemBox', source, QBCore.Shared.Items[item], "remove", 1)
-    end
-end)
 
-RegisterNetEvent('pc-loot-crates:server:DropLoot', function(item)
-    local player = QBCore.Functions.GetPlayer(source)
-    local lootCrate = Config.LootCrates[item]
-    local lootTable = lootCrate.LootTable
-    local lootTableSize = #lootTable
-    local numberOfItemsRoll = math.random(lootCrate.MinDrops, lootCrate.MaxDrops)
-    local itemRoll = 0
-    local item = nil
+        for i=1,numberOfItemsRoll do
+            itemRoll = math.random(1, lootTable[lootTableSize].Chances)
 
-    for i=1,numberOfItemsRoll do
-        itemRoll = math.random(1, lootTable[lootTableSize].Chances)
+            for l,q in ipairs(lootTable) do
+                if itemRoll <= q.Chances then
+                    lootItem = q.Item
+                else
+                    break
+                end
+            end
 
-        for l,q in ipairs(lootTable) do
-            if itemRoll <= q.Chances then
-                item = q.Item
-            else
-                break
+            if player.Functions.AddItem(lootItem, 1) then
+                TriggerClientEvent('inventory:client:ItemBox', QBCore.Shared.Items[lootItem], "add", 1)
             end
         end
 
-        if player.Functions.AddItem(item, 1) then
-            TriggerClientEvent('inventory:client:ItemBox', source, QBCore.Shared.Items[item], "add", 1)
-        end
+        TriggerClientEvent('pc-loot-crates:client:MakeInvAvailable', source)
     end
 end)
