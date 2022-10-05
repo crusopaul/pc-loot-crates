@@ -1,4 +1,4 @@
-#pc-loot-crates
+# pc-loot-crates
 A generic loot crate resource for qb-core
 
 ## Installation
