@@ -9,8 +9,8 @@ shared_scripts {
     'config.lua',
     'locale/*.lua'
 }
-server_script 'server/*.lua'
-client_script 'client/*.lua'
+server_script 'server/main.lua'
+client_script 'client/main.lua'
 
 dependencies {
     '/onesync'
