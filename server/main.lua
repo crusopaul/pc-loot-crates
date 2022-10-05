@@ -32,14 +32,14 @@ RegisterNetEvent('pc-loot-crates:server:DropLoot', function(item)
     local player = QBCore.Functions.GetPlayer(source)
 
     if player.Functions.RemoveItem(item, 1) then
+        TriggerClientEvent('inventory:client:ItemBox', source, QBCore.Shared.Items[item], "remove", 1)
+
         local lootCrate = Config.LootCrates[item]
         local lootTable = lootCrate.LootTable
         local lootTableSize = #lootTable
         local numberOfItemsRoll = math.random(lootCrate.MinDrops, lootCrate.MaxDrops)
         local itemRoll = 0
         local lootItem = nil
-
-        TriggerClientEvent('inventory:client:ItemBox', source, QBCore.Shared.Items[item], "remove", 1)
 
         for i=1,numberOfItemsRoll do
             itemRoll = math.random(1, lootTable[lootTableSize].Chances)
