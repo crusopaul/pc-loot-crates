@@ -16,7 +16,13 @@ for k,v in pairs(Config.LootCrates) do
             end
         end
     else
-        print(Lang:t('Errors.MissingItem'))
+        print('~r~Error: Item "'..k..'" not in qb-core/shared/items.lua')
+    end
+
+    for _,q in ipairs(v.LootTable) do
+        if not QBCore.Shared.Items[q.Item] then
+            print('~r~Error: Item "'..q.Item..'" not in qb-core/shared/items.lua (from '..k.."'s loot table)")
+        end
     end
 end
 
