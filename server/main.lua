@@ -1,30 +1,32 @@
 local QBCore = exports['qb-core']:GetCoreObject()
 
-for k,v in pairs(Config.LootCrates) do
-    if QBCore.Shared.Items[k] then
-        QBCore.Functions.CreateUseableItem(k, function(source, item)
-            local player = QBCore.Functions.GetPlayer(source)
+CreateThread(function()
+    for k,v in pairs(Config.LootCrates) do
+        if QBCore.Shared.Items[k] then
+            QBCore.Functions.CreateUseableItem(k, function(source, item)
+                local player = QBCore.Functions.GetPlayer(source)
 
-            if player.Functions.GetItemByName(item.name) then
-                TriggerClientEvent('pc-loot-crates:client:OpenCrate', source, item)
+                if player.Functions.GetItemByName(item.name) then
+                    TriggerClientEvent('pc-loot-crates:client:OpenCrate', source, item)
+                end
+            end)
+
+            for l,q in ipairs(v.LootTable) do
+                if v.LootTable[l - 1] then
+                    v.LootTable[l].Chances += v.LootTable[l - 1].Chances
+                end
             end
-        end)
+        else
+            print('~r~Error: Item "'..k..'" not in qb-core/shared/items.lua')
+        end
 
-        for l,q in ipairs(v.LootTable) do
-            if v.LootTable[l - 1] then
-                v.LootTable[l].Chances += v.LootTable[l - 1].Chances
+        for _,q in ipairs(v.LootTable) do
+            if not QBCore.Shared.Items[q.Item] then
+                print('~r~Error: Item "'..q.Item..'" not in qb-core/shared/items.lua (from '..k.."'s loot table)")
             end
         end
-    else
-        print('~r~Error: Item "'..k..'" not in qb-core/shared/items.lua')
     end
-
-    for _,q in ipairs(v.LootTable) do
-        if not QBCore.Shared.Items[q.Item] then
-            print('~r~Error: Item "'..q.Item..'" not in qb-core/shared/items.lua (from '..k.."'s loot table)")
-        end
-    end
-end
+end)
 
 RegisterNetEvent('pc-loot-crates:server:DropLoot', function(item)
     local player = QBCore.Functions.GetPlayer(source)
