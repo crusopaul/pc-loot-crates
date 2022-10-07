@@ -4,8 +4,8 @@ Config = {
             MinDrops = 1,
             MaxDrops = 1,
             LootTable = {
-                1 = { Item = 'water_bottle', Chances = '1' },
-                2 = { Item = 'sandwich', Chances = '2' },
+                { Item = 'water_bottle', Chances = '1' },
+                { Item = 'sandwich', Chances = '2' },
             }
         },
     }
