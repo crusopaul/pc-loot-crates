@@ -1,5 +1,5 @@
 # pc-loot-crates
-A generic loot crate resource for qb-core
+A generic loot crate resource for qb-core.
 
 ## Installation
 To install pc-loot-crates, one must copy all images from html/images into the corresponding folder for the relevant inventory system.
