@@ -1,8 +1,8 @@
 local QBCore = exports['qb-core']:GetCoreObject()
 
-RegisterNetEvent('pc-loot-crates:client:OpenCrate', function(lootBoxItemName, label, slot)
+RegisterNetEvent('pc-loot-crates:client:OpenCrate', function(lootBoxItemName, lootBoxLabel, lootBoxSlot)
     if Config.Debug then
-        print('~y~Event "pc-loot-crates:server:DropLoot" fired: '..lootBoxItemName..', '..label..', '..tostring(slot))
+        print('~y~Event "pc-loot-crates:server:DropLoot" fired: '..lootBoxItemName..', '..lootBoxLabel..', '..tostring(lootBoxSlot))
     end
 
     if not LocalPlayer.state.inv_busy then
@@ -12,9 +12,10 @@ RegisterNetEvent('pc-loot-crates:client:OpenCrate', function(lootBoxItemName, la
 
         LocalPlayer.state:set("inv_busy", true, true)
         TriggerEvent('inventory:client:busy:status', true)
+        TriggerEvent('canUseInventoryAndHotbar:toggle', true)
         QBCore.Functions.Progressbar(
             'pc-loot-crate:OpeningCrate',
-            'Opening '..(label or '')..'..',
+            'Opening '..(lootBoxLabel or '')..'..',
             math.random(3000,4000),
             false,
             false,
@@ -27,15 +28,15 @@ RegisterNetEvent('pc-loot-crates:client:OpenCrate', function(lootBoxItemName, la
             {},
             {},
             {},
-            function() end,
             function()
                 if Config.Debug then
                     print('~y~Progressbar callback fired')
-                    print('~y~Firing event "pc-loot-crates:server:DropLoot": '..lootBoxItemName..', '..tostring(slot))
+                    print('~y~Firing event "pc-loot-crates:server:DropLoot": '..lootBoxItemName..', '..tostring(lootBoxSlot))
                 end
 
-                TriggerServerEvent('pc-loot-crates:server:DropLoot', lootBoxItemName, slot)
-            end
+                TriggerServerEvent('pc-loot-crates:server:DropLoot', lootBoxItemName, lootBoxSlot)
+            end,
+            function() end
         )
     elseif Config.Debug then
         print('~y~Inventory is busy')
@@ -50,4 +51,5 @@ RegisterNetEvent('pc-loot-crates:client:MakeInvAvailable', function()
 
     LocalPlayer.state:set("inv_busy", false, true)
     TriggerEvent('inventory:client:busy:status', false)
+    TriggerEvent('canUseInventoryAndHotbar:toggle', false)
 end)

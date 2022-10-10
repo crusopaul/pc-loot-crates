@@ -20,12 +20,14 @@ AddEventHandler('onResourceStarting', function(resourceName)
                         local player = QBCore.Functions.GetPlayer(source)
                         local lootBoxItemName = item.name
                         local lootBoxSlot = item.slot
+                        local lootBoxLabel = iQBCore.Shared.Items.[lootBoxItemName].label
 
                         if player.Functions.GetItemByName(lootBoxItemName) then
                             if Config.Debug then
-                                print('~y~Firing event "pc-loot-crates:client:OpenCrate": '..tostring(source)..', '..lootBoxItemName..', '..QBCore.Shared.Items.[lootBoxItemName].label..', '..tostring(lootBoxSlot))
+                                print('~y~Firing event "pc-loot-crates:client:OpenCrate": '..tostring(source)..', '..lootBoxItemName..', '..lootBoxLabel..', '..tostring(lootBoxSlot))
                             end
-                            TriggerClientEvent('pc-loot-crates:client:OpenCrate', source, lootBoxItemName, QBCore.Shared.Items.[lootBoxItemName].label, lootBoxSlot)
+
+                            TriggerClientEvent('pc-loot-crates:client:OpenCrate', source, lootBoxItemName, lootBoxLabel, lootBoxSlot)
                         elseif Config.Debug then
                             print('~y~Could not locate "'..lotBoxItemName..'" on player '..tostring(source))
                         end
