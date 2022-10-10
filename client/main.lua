@@ -1,12 +1,12 @@
 local QBCore = exports['qb-core']:GetCoreObject()
 
-RegisterNetEvent('pc-loot-crates:client:OpenCrate', function(item)
+RegisterNetEvent('pc-loot-crates:client:OpenCrate', function(lootBoxItemName, label, slot)
     if not LocalPlayer.state.inv_busy then
         LocalPlayer.state:set("inv_busy", true, true)
         TriggerEvent('inventory:client:busy:status', true)
         QBCore.Functions.Progressbar(
             'pc-loot-crate:OpeningCrate',
-            'Opening '..QBCore.Shared.Items[item].label..'..',
+            'Opening '..(label or '')..'..',
             math.random(3000,4000),
             false,
             false,
@@ -21,7 +21,7 @@ RegisterNetEvent('pc-loot-crates:client:OpenCrate', function(item)
             {},
             function() end,
             function()
-                TriggerServerEvent('pc-loot-crates:server:DropLoot', item)
+                TriggerServerEvent('pc-loot-crates:server:DropLoot', lootBoxItemName, slot)
             end
         )
     end

@@ -5,14 +5,16 @@ CreateThread(function()
         if QBCore.Shared.Items[k] then
             QBCore.Functions.CreateUseableItem(k, function(source, item)
                 local player = QBCore.Functions.GetPlayer(source)
+                local lootBoxItemName = item.name
+                local lootBoxSlot = item.slot
 
-                if player.Functions.GetItemByName(item.name) then
-                    TriggerClientEvent('pc-loot-crates:client:OpenCrate', source, item)
+                if player.Functions.GetItemByName(lootBoxItemName) then
+                    TriggerClientEvent('pc-loot-crates:client:OpenCrate', source, lootBoxItemName, QBCore.Shared.Items.[lootBoxItemName].label, lootBoxSlot)
                 end
             end)
 
-            for l,q in ipairs(v.LootTable) do
-                if v.LootTable[l - 1] then
+            for l,_ in ipairs(v.LootTable) do
+                if l ~= 1 then
                     v.LootTable[l].Chances += v.LootTable[l - 1].Chances
                 end
             end
@@ -28,13 +30,14 @@ CreateThread(function()
     end
 end)
 
-RegisterNetEvent('pc-loot-crates:server:DropLoot', function(item)
+RegisterNetEvent('pc-loot-crates:server:DropLoot', function(lootBoxItemName, slot)
     local player = QBCore.Functions.GetPlayer(source)
+    TriggerClientEvent('pc-loot-crates:client:MakeInvAvailable', source)
 
-    if player.Functions.RemoveItem(item, 1) then
-        TriggerClientEvent('inventory:client:ItemBox', source, QBCore.Shared.Items[item], "remove", 1)
+    if player.Functions.RemoveItem(lootBoxItemName, 1, slot) then
+        TriggerClientEvent('inventory:client:ItemBox', source, QBCore.Shared.Items[lootBoxItemName], "remove", 1)
 
-        local lootCrate = Config.LootCrates[item]
+        local lootCrate = Config.LootCrates[lootBoxItemName]
         local lootTable = lootCrate.LootTable
         local lootTableSize = #lootTable
         local numberOfItemsRoll = math.random(lootCrate.MinDrops, lootCrate.MaxDrops)
@@ -56,7 +59,5 @@ RegisterNetEvent('pc-loot-crates:server:DropLoot', function(item)
                 TriggerClientEvent('inventory:client:ItemBox', QBCore.Shared.Items[lootItem], "add", 1)
             end
         end
-
-        TriggerClientEvent('pc-loot-crates:client:MakeInvAvailable', source)
     end
 end)
