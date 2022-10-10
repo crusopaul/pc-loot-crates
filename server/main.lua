@@ -1,41 +1,67 @@
 local QBCore = exports['qb-core']:GetCoreObject()
 
-CreateThread(function()
-    for k,v in pairs(Config.LootCrates) do
-        if QBCore.Shared.Items[k] then
-            QBCore.Functions.CreateUseableItem(k, function(source, item)
-                local player = QBCore.Functions.GetPlayer(source)
-                local lootBoxItemName = item.name
-                local lootBoxSlot = item.slot
-
-                if player.Functions.GetItemByName(lootBoxItemName) then
-                    TriggerClientEvent('pc-loot-crates:client:OpenCrate', source, lootBoxItemName, QBCore.Shared.Items.[lootBoxItemName].label, lootBoxSlot)
+AddEventHandler('onResourceStarting', function(resourceName)
+    if resourceName == GetCurrentResourceName() then
+        for k,v in pairs(Config.LootCrates) do
+            if QBCore.Shared.Items[k] then
+                for _,q in ipairs(v.LootTable) do
+                    if not QBCore.Shared.Items[q.Item] then
+                        print('~r~Error: Item "'..q.Item..'" not in qb-core/shared/items.lua (from '..k.."'s loot table)")
+                        CancelEvent()
+                    end
                 end
-            end)
 
-            for l,_ in ipairs(v.LootTable) do
-                if l ~= 1 then
-                    v.LootTable[l].Chances += v.LootTable[l - 1].Chances
+                if ~WasEventCanceled() then
+                    QBCore.Functions.CreateUseableItem(k, function(source, item)
+                        if Config.Debug then
+                            print('~y~Usable item callback fired: '..tostring(source)..', '..item.name)
+                        end
+
+                        local player = QBCore.Functions.GetPlayer(source)
+                        local lootBoxItemName = item.name
+                        local lootBoxSlot = item.slot
+
+                        if player.Functions.GetItemByName(lootBoxItemName) then
+                            if Config.Debug then
+                                print('~y~Firing event "pc-loot-crates:client:OpenCrate": '..tostring(source)..', '..lootBoxItemName..', '..QBCore.Shared.Items.[lootBoxItemName].label..', '..tostring(lootBoxSlot))
+                            end
+                            TriggerClientEvent('pc-loot-crates:client:OpenCrate', source, lootBoxItemName, QBCore.Shared.Items.[lootBoxItemName].label, lootBoxSlot)
+                        elseif Config.Debug then
+                            print('~y~Could not locate "'..lotBoxItemName..'" on player '..tostring(source))
+                        end
+                    end)
+
+                    for l,_ in ipairs(v.LootTable) do
+                        if l ~= 1 then
+                            v.LootTable[l].Chances += v.LootTable[l - 1].Chances
+                        end
+                    end
                 end
+            else
+                print('~r~Error: Item "'..k..'" not in qb-core/shared/items.lua')
+                CancelEvent()
             end
-        else
-            print('~r~Error: Item "'..k..'" not in qb-core/shared/items.lua')
         end
 
-        for _,q in ipairs(v.LootTable) do
-            if not QBCore.Shared.Items[q.Item] then
-                print('~r~Error: Item "'..q.Item..'" not in qb-core/shared/items.lua (from '..k.."'s loot table)")
-            end
+        if WasEventCanceled() then
+            print('~r~pc-loot-crates failed to start')
         end
     end
 end)
 
 RegisterNetEvent('pc-loot-crates:server:DropLoot', function(lootBoxItemName, slot)
+    if Config.Debug then
+        print('~y~Event "pc-loot-crates:server:DropLoot" fired: '..lootBoxItemName..', '..tostring(slot))
+    end
+
     local player = QBCore.Functions.GetPlayer(source)
-    TriggerClientEvent('pc-loot-crates:client:MakeInvAvailable', source)
 
     if player.Functions.RemoveItem(lootBoxItemName, 1, slot) then
-        TriggerClientEvent('inventory:client:ItemBox', source, QBCore.Shared.Items[lootBoxItemName], "remove", 1)
+        if Config.Debug then
+            print('~y~Firing event "inventory:client:ItemBox": '..tostring(source)..', '..lootBoxItemName..', remove')
+        end
+
+        TriggerClientEvent('inventory:client:ItemBox', source, QBCore.Shared.Items[lootBoxItemName], "remove")
 
         local lootCrate = Config.LootCrates[lootBoxItemName]
         local lootTable = lootCrate.LootTable
@@ -56,8 +82,22 @@ RegisterNetEvent('pc-loot-crates:server:DropLoot', function(lootBoxItemName, slo
             end
 
             if player.Functions.AddItem(lootItem, 1) then
-                TriggerClientEvent('inventory:client:ItemBox', QBCore.Shared.Items[lootItem], "add", 1)
+                if Config.Debug then
+                    print('~y~Firing event "inventory:client:ItemBox": '..tostring(source)..', '..lootItem..', add')
+                end
+
+                TriggerClientEvent('inventory:client:ItemBox', QBCore.Shared.Items[lootItem], "add")
+            elseif Config.Debug then
+                print('~y~Could not add "'..lootItem..'"')
             end
         end
+    elseif Config.Debug then
+        print('~y~Could not remove "'..lootBoxItemName..'" from slot '..tostring(slot))
     end
+
+    if Config.Debug then
+        print('~y~Firing event "pc-loot-crates:client:MakeInvAvailable": '..tostring(source))
+    end
+
+    TriggerClientEvent('pc-loot-crates:client:MakeInvAvailable', source)
 end)

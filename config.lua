@@ -1,4 +1,5 @@
 Config = {
+    Debug = true,
     LootCrates = {
         ['lootcrate'] = {
             MinDrops = 1,
