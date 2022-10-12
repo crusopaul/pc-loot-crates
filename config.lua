@@ -1,12 +1,11 @@
 Config = {
-    Debug = true,
     LootCrates = {
         ['lootcrate'] = {
-            MinDrops = 1,
-            MaxDrops = 1,
+            MinDrops = 10,
+            MaxDrops = 10,
             LootTable = {
-                { Item = 'water_bottle', Chances = '1' },
-                { Item = 'sandwich', Chances = '2' },
+                { Item = 'water_bottle', Chances = 1 },
+                { Item = 'sandwich', Chances = 1 },
             }
         },
     }
