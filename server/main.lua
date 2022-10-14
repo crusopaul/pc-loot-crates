@@ -1,7 +1,7 @@
 local QBCore = exports['qb-core']:GetCoreObject()
 
 CreateThread(function()
-    for k,v in pairs(Config.LootCrates) do
+    for k,v in pairs(Config.Server.LootCrates) do
         if QBCore.Shared.Items[k] then
             for _,q in ipairs(v.LootTable) do
                 if not QBCore.Shared.Items[q.Item] then
@@ -37,7 +37,7 @@ RegisterNetEvent('pc-loot-crates:server:DropLoot', function(lootBoxItemName, loo
     if player.Functions.RemoveItem(lootBoxItemName, 1, lootBoxSlot) then
         TriggerClientEvent('inventory:client:ItemBox', source, QBCore.Shared.Items[lootBoxItemName], "remove")
 
-        local lootCrate = Config.LootCrates[lootBoxItemName]
+        local lootCrate = Config.Server.LootCrates[lootBoxItemName]
         local lootTable = lootCrate.LootTable
         local lootTableSize = #lootTable
         local numberOfItemsRoll = 0
@@ -66,12 +66,8 @@ RegisterNetEvent('pc-loot-crates:server:DropLoot', function(lootBoxItemName, loo
             if player.Functions.AddItem(lootItem, 1) then
                 TriggerClientEvent('inventory:client:ItemBox', source, QBCore.Shared.Items[lootItem], "add")
             else
-                if i == 1 then
-                    if player.Functions.AddItem(lootItem, 1) then
-                        TriggerClientEvent('inventory:client:ItemBox', source, QBCore.Shared.Items[lootBoxItemName], "add")
-                    else
-                        TriggerClientEvent('QBCore:Notify', source, 'Could not reimburse loot crate '..lootBoxItemName)
-                    end
+                if i == 1 and player.Functions.AddItem(lootBoxItemName, 1) then
+                    TriggerClientEvent('inventory:client:ItemBox', source, QBCore.Shared.Items[lootBoxItemName], "add")
                 else
                     TriggerClientEvent('QBCore:Notify', source, 'Could not reimburse loot crate '..lootBoxItemName)
                 end

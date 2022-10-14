@@ -4,7 +4,6 @@ RegisterNetEvent('pc-loot-crates:client:OpenCrate', function(lootBoxItemName, lo
     if not LocalPlayer.state.inv_busy then
         LocalPlayer.state:set("inv_busy", true, true)
         TriggerEvent('inventory:client:busy:status', true)
-        TriggerEvent('canUseInventoryAndHotbar:toggle', true)
         QBCore.Functions.Progressbar(
             'pc-loot-crate:OpeningCrate',
             'Opening '..(lootBoxLabel or '')..'..',
@@ -31,5 +30,4 @@ end)
 RegisterNetEvent('pc-loot-crates:client:MakeInvAvailable', function()
     LocalPlayer.state:set("inv_busy", false, true)
     TriggerEvent('inventory:client:busy:status', false)
-    TriggerEvent('canUseInventoryAndHotbar:toggle', false)
 end)
